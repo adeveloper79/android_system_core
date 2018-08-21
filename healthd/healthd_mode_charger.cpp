@@ -82,6 +82,7 @@ char *locale;
 #define LOGW(x...) do { KLOG_WARNING("charger", x); } while (0)
 #define LOGV(x...) do { KLOG_DEBUG("charger", x); } while (0)
 
+#define BRIGHTNESS_PATH		"/sys/class/leds/lcd-backlight/brightness"
 static constexpr const char* animation_desc_path = "/res/values/charger/animation.txt";
 
 struct key_state {
@@ -478,6 +479,7 @@ static void update_screen_state(struct charger *charger, int64_t now)
 
 #ifndef CHARGER_DISABLE_INIT_BLANK
         gr_fb_blank(true);
+	base::WriteStringToFile("0", BRIGHTNESS_PATH);
 #endif
         minui_inited = true;
     }
@@ -487,6 +489,7 @@ static void update_screen_state(struct charger *charger, int64_t now)
         reset_animation(batt_anim);
         charger->next_screen_transition = -1;
         gr_fb_blank(true);
+	base::WriteStringToFile("0", BRIGHTNESS_PATH);
         LOGV("[%" PRId64 "] animation done\n", now);
         if (charger->charger_connected)
             request_suspend(true);
@@ -520,8 +523,10 @@ static void update_screen_state(struct charger *charger, int64_t now)
     }
 
     /* unblank the screen  on first cycle */
-    if (batt_anim->cur_cycle == 0)
+    if (batt_anim->cur_cycle == 0) {
         gr_fb_blank(false);
+	base::WriteStringToFile("100", BRIGHTNESS_PATH);
+    }
 
     /* draw the new frame (@ cur_frame) */
     redraw_screen(charger);
@@ -631,6 +636,7 @@ static void process_key(struct charger *charger, int code, int64_t now)
                    accordingly. */
                 if (property_get_bool("ro.enable_boot_charger_mode", false)) {
                     LOGW("[%" PRId64 "] booting from charger mode\n", now);
+		    base::WriteStringToFile("0", BRIGHTNESS_PATH);
                     property_set("sys.boot_from_charger_mode", "1");
                 } else {
                     if (charger->batt_anim->cur_level >= charger->boot_min_cap) {

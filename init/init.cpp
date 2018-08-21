@@ -256,7 +256,7 @@ static void security_failure() {
     android_reboot(ANDROID_RB_RESTART2, 0, "recovery");
     while (true) { pause(); }  // never reached
 }
-
+#if 0
 #define MMAP_RND_PATH "/proc/sys/vm/mmap_rnd_bits"
 #define MMAP_RND_COMPAT_PATH "/proc/sys/vm/mmap_rnd_compat_bits"
 
@@ -344,7 +344,7 @@ static int set_mmap_rnd_bits_action(const std::vector<std::string>& args)
     }
     return ret;
 }
-
+#endif
 static int keychord_init_action(const std::vector<std::string>& args)
 {
     keychord_init();
@@ -702,7 +702,7 @@ int main(int argc, char** argv) {
     am.QueueBuiltinAction(wait_for_coldboot_done_action, "wait_for_coldboot_done");
     // ... so that we can start queuing up actions that require stuff from /dev.
     am.QueueBuiltinAction(mix_hwrng_into_linux_rng_action, "mix_hwrng_into_linux_rng");
-    am.QueueBuiltinAction(set_mmap_rnd_bits_action, "set_mmap_rnd_bits");
+    //am.QueueBuiltinAction(set_mmap_rnd_bits_action, "set_mmap_rnd_bits");
     am.QueueBuiltinAction(keychord_init_action, "keychord_init");
     am.QueueBuiltinAction(console_init_action, "console_init");
 

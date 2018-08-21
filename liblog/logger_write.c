@@ -35,6 +35,10 @@
 #include "log_portability.h"
 #include "logger.h"
 
+#ifndef FAKE_LOG_DEVICE
+#include <sys/system_properties.h>
+#endif
+
 #define LOG_BUF_SIZE 1024
 
 static int __write_to_log_init(log_id_t, struct iovec *vec, size_t nr);
